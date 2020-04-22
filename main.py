@@ -1,16 +1,14 @@
-from parser import *
-from renderer import Render
-from gentable import createTable
+from table import PrintTable
+from AST import *
 
-testFile = "expression.txt"
-raw = ""
-with open(testFile,'r') as f:
-    raw = f.read()
 
-var,expr = ParseForTable(raw[:])
 
-image = ParseForLaTex(raw[:])
-Render(image)
+tests = ["!(A+B)+(A*B)","!a + !b"]
 
-createTable(var,expr)
+raw = tests[1]
 
+v = list(variables(raw))
+o = Onion(raw)
+print(o)
+print)
+PrintTable(o,v)

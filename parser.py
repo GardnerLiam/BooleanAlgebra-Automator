@@ -1,32 +1,27 @@
-def ParseForTable(raw):
-    legals = ['!', '+', '*', '(', ')'," ","\n"]
+from AST import *
 
-    stripped = raw[:]
-    for i in legals:
-        stripped = stripped.replace(i, "")
-    variables = set(stripped)
+from itertools import product
+import types
 
-    text = raw.replace("!","not ").replace("+","|").replace("*","&")
+def Peel(onion,variables,dictionary):
+    c = onion[:]
+    for i in range(len(onion)):
+        if isinstance(onion[i],list):
+            c[i] = Evaluate(Peel(onion[i],variables,dictionary),variables,dictionary)
+    return c
 
-    return variables,text
+def Evaluate(layer,v,d):
+    c = []
+    for i in range(len(layer)):
+        if isinstance(layer[i],bool):
+            c.append(str(layer[i]))
+        elif layer[i] in v:
+            c.append(str(d[layer[i]]))
+        elif layer[i] == "!":
+            c.append("not ")
+        elif layer[i] == "+":
+            c.append("|")
+        elif layer[i] == "*":
+            c.append("&")
+    return eval(''.join(c))
 
-def ParseForLaTex(raw):
-    before = [r"!", r"*"]
-    after =  [r"\overline",r"\cdot"]
-    brackets = ["(",")"]
-    text = [i for i in raw[:]]
-
-    replaceNextBracket = False
-    for i in range(len(text)):
-        if i+1 < len(text):
-            if (text[i] in before):
-                if(text[i+1] == "(" and text[i]==before[0]):
-                    replaceNextBracket = True
-                    text[i+1] = '{'
-                text[i] = after[before.index(text[i])]
-        if replaceNextBracket:
-            if (text[i] == ")"):
-                text[i] = "}"
-                replaceNextBracket = False
-
-    return ("Q=" + ''.join(text))[:-1]
